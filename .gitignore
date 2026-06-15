@@ -1,0 +1,4 @@
+node_modules/
+chrome_session/
+config.json
+.DS_Store

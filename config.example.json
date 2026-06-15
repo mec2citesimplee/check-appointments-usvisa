@@ -1,0 +1,8 @@
+{
+  "email": "votre_email@exemple.com",
+  "password": "votre_mot_de_passe",
+  "location": "Paris",
+  "checkIntervalMs": 180000,
+  "targetMonth": "July 2026",
+  "url": "https://www.usvisaappt.com/visaapplicantui/login"
+}

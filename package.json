@@ -1,0 +1,16 @@
+{
+  "name": "mini-bot-fixed",
+  "version": "1.0.0",
+  "description": "Visa Appointment Bot rebuilt in Puppeteer",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "postinstall": "sed -i '' 's/\"type\": \"module\",//g' node_modules/yargs/package.json || true"
+  },
+  "dependencies": {
+    "puppeteer": "^22.15.0",
+    "puppeteer-core": "^25.1.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}
