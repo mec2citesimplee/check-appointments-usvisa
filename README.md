@@ -1,45 +1,114 @@
 # Visa Appointment Bot
 
-Ce script automatise la surveillance du calendrier de rendez-vous sur le site des visas. Il vérifie régulièrement les disponibilités et déclenche une alerte sonore et visuelle si un créneau est trouvé avant une date limite définie.
-
-## 1. Prérequis (Installation initiale)
-
-Le script nécessite **Node.js** pour fonctionner.
-1. Rendez-vous sur le site officiel : [https://nodejs.org/](https://nodejs.org/)
-2. Téléchargez et installez la version LTS (recommandée).
-
-## 2. Configuration
-
-Ouvrez le fichier `config.json` avec un éditeur de texte standard (Bloc-notes, TextEdit, VS Code) et personnalisez les paramètres suivants :
-
-- `"email"` : L'adresse email associée à votre compte.
-- `"password"` : Le mot de passe de votre compte.
-- `"location"` : La ville sélectionnée pour le rendez-vous (ex: `"Paris"`).
-- `"targetMonth"` : Le mois limite de recherche (ex: `"July 2026"` ou `"August 2026"`). **Important :** Écrivez toujours le mois en **anglais** pour que le programme le comprenne correctement. Le bot déclenchera une notification si un rendez-vous est trouvé **avant** ou **pendant** ce mois précis.
-- `"checkIntervalMs"` : Le délai d'attente entre chaque vérification de calendrier, exprimé en millisecondes (par défaut `180000`, soit 3 minutes). Vous pouvez réduire ou augmenter cette valeur selon vos besoins.
-
-*N'oubliez pas d'enregistrer le fichier après avoir apporté vos modifications.*
-
-## 3. Lancement du Bot
-
-L'exécution du script a été simplifiée au maximum :
-
-- **Sur macOS** : Double-cliquez sur le script `start-mac.command`
-- **Sur Windows** : Double-cliquez sur le script `start-windows.bat`
-
-### Déroulement de l'exécution :
-1. Lors du tout premier lancement, le script téléchargera automatiquement les dépendances logicielles nécessaires (cette étape peut prendre environ une minute).
-2. Une fenêtre Google Chrome automatisée s'ouvrira et pré-remplira vos identifiants.
-3. **Action requise** : Vous devez résoudre le CAPTCHA manuellement et cliquer sur "Connexion".
-4. Une fois l'authentification réussie, laissez simplement la fenêtre Chrome ouverte (vous pouvez la réduire). Le script s'occupera du rafraîchissement régulier du calendrier.
-
-*Note de confort : La session de navigation est sauvegardée localement. Lors de vos prochaines utilisations, le navigateur s'ouvrira directement sur votre espace connecté, sans nécessiter de nouveau CAPTCHA.*
+Ce script automatise la surveillance du calendrier de rendez-vous sur le site des visas US. Il vérifie régulièrement les disponibilités et déclenche une alerte sonore et visuelle si un créneau est trouvé avant une date limite définie.
 
 ---
 
-> **🚑 Dépannage Mac (Si le fichier refuse de s'ouvrir) :**
-> Si votre Mac refuse d'ouvrir `start-mac.command` pour une question de "privilèges", c'est une sécurité d'Apple. Pour corriger ça en 5 secondes :
-> 1. Ouvrez l'application **Terminal** (sur votre Mac).
-> 2. Tapez `chmod +x ` (n'oubliez pas l'espace à la fin).
-> 3. Glissez et déposez le fichier `start-mac.command` directement dans la fenêtre du Terminal.
-> 4. Appuyez sur la touche Entrée. C'est réparé pour toujours, vous pouvez double-cliquer dessus !
+## 1. Prérequis
+
+- **Node.js v18 ou supérieur** — [Télécharger sur nodejs.org](https://nodejs.org/)
+- **Connexion internet** — Chrome (~300 MB) est téléchargé automatiquement à la première installation
+- **Compte actif** sur [usvisaappt.com](https://www.usvisaappt.com/)
+
+---
+
+## 2. Configuration
+
+Ouvrez le fichier `config.json` avec un éditeur de texte (Bloc-notes, TextEdit, VS Code) et personnalisez :
+
+```json
+{
+  "email": "votre_email@exemple.com",
+  "password": "votre_mot_de_passe",
+  "location": "Paris",
+  "checkIntervalMs": 180000,
+  "targetMonth": "July 2026",
+  "url": "https://www.usvisaappt.com/visaapplicantui/login"
+}
+```
+
+| Champ | Description | Exemple |
+|---|---|---|
+| `email` | Votre email de connexion | `"jean@mail.com"` |
+| `password` | Votre mot de passe | `"MonMotDePasse"` |
+| `location` | Ambassade/consulat cible | `"Paris"` |
+| `checkIntervalMs` | Délai entre chaque vérification (ms) | `180000` = 3 min |
+| `targetMonth` | Mois limite (en **anglais**) | `"July 2026"` |
+| `url` | URL du site — ne pas modifier | — |
+
+### Villes / Consulats valides pour `"location"`
+
+Le bot cherche ce texte dans le menu déroulant du site. Utilisez le nom exact affiché sur le site :
+
+- `"Paris"`
+- `"Marseille"`
+- `"Bordeaux"`
+- `"Lyon"`
+- `"Strasbourg"`
+
+> **Note :** Si votre ville n'est pas trouvée, le bot affichera un avertissement `[WARN]`. Vérifiez le nom exact en vous connectant manuellement sur le site.
+
+---
+
+## 3. Lancement
+
+- **Sur macOS** : Double-cliquez sur `start-mac.command`
+- **Sur Windows** : Double-cliquez sur `start-windows.bat`
+
+### Déroulement :
+1. Vérification de Node.js (≥ 18)
+2. Installation des dépendances au **premier lancement** (~300 MB, 1–2 min)
+3. Chrome s'ouvre et pré-remplit vos identifiants
+4. **Action requise** : Résoudre le CAPTCHA et cliquer sur "Connexion"
+5. Le bot surveille le calendrier automatiquement — vous pouvez réduire la fenêtre Chrome
+
+> **Session sauvegardée** : La session est conservée dans le dossier `chrome_session`. Aux prochains lancements, vous serez directement connecté sans nouveau CAPTCHA.
+
+---
+
+## 4. Comprendre les logs
+
+Le bot affiche des messages horodatés dans le terminal :
+
+| Niveau | Signification |
+|---|---|
+| `[INFO]` | Fonctionnement normal |
+| `[WARN]` | Avertissement non bloquant (session expirée, option introuvable…) |
+| `[ALERT]` | 🚨 Créneau trouvé ! Une notification apparaît aussi sur votre bureau |
+| `[ERROR]` | Erreur bloquante |
+
+---
+
+## 5. Dépannage
+
+### 🔒 Session expirée
+Le bot détecte automatiquement si votre session expire et attend que vous vous reconnectiez dans Chrome. Une notification de bureau vous prévient.
+
+### 📡 Erreur réseau
+Le bot retente automatiquement jusqu'à 3 fois en cas d'échec réseau. Après 5 erreurs consécutives, il s'arrête proprement avec une notification.
+
+### 🍎 macOS — « fichier endommagé » ou refusé à l'ouverture
+
+**Cas 1 — Reçu par WhatsApp / email / AirDrop**
+
+macOS bloque les fichiers `.command` reçus via une application tierce (quarantaine Gatekeeper). Pour débloquer **tout le dossier** en une commande :
+
+1. Ouvrez l'application **Terminal** (⌘ + Espace → "Terminal")
+2. Tapez `xattr -cr ` (avec un espace à la fin)
+3. Glissez le **dossier** `mini-bot-fixed` directement dans la fenêtre Terminal
+4. Appuyez sur Entrée
+
+Le dossier est maintenant déblocqué. Double-cliquez sur `start-mac.command` — ça marche.
+
+**Cas 2 — Problème de permissions (téléchargé depuis internet)**
+
+1. Ouvrez l'application **Terminal**
+2. Tapez `chmod +x ` (avec un espace à la fin)
+3. Glissez `start-mac.command` dans la fenêtre Terminal
+4. Appuyez sur Entrée — c'est réglé définitivement
+
+### ❌ `config.json` absent au démarrage
+Le bot crée automatiquement `config.json` depuis le modèle `config.example.json`. Renseignez vos identifiants et relancez.
+
+### ❌ Version Node incorrecte
+Le script de lancement vérifie que Node ≥ 18 est installé et affiche un message clair si ce n'est pas le cas. Mettez à jour Node depuis [nodejs.org](https://nodejs.org/).
